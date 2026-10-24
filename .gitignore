@@ -1,0 +1,7 @@
+# 本地构建缓存（下载的发行包、解压内容、校验工具）
+.build/
+
+# 系统安装镜像（15 GB+）
+macOS Downloads/
+
+.DS_Store
