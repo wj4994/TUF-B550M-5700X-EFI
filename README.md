@@ -19,10 +19,10 @@
 
 ## 状态
 
-- 支持 macOS Monterey 12 ~ Sequoia 15（内核补丁上限 `25.99.99`，理论覆盖到 macOS 26）。
-- 目标系统：**macOS Sequoia 15.7.9**（`macOS Downloads/` 中的 `InstallAssistant.pkg`）。
+- **已实机验证：macOS Sequoia 15.8.1**（本仓库 `OC/config.plist` 原样引导，无需临时改配置）。
+- 支持范围：macOS Monterey 12 ~ Sequoia 15（12 ~ 15.8.1 之间未逐一回归；内核补丁上限 `25.99.99` 理论覆盖到 macOS 26 Tahoe，但 26 未验证）。
 - 除 Wi-Fi、蓝牙外功能正常；MT7921 无解，需要无线请更换为 BCM94360NG 等免驱卡（主板 M.2 E-Key 可拆换）。
-- 本 EFI **未在真机上验证过启动**，首次引导请按「故障排查」一节逐步确认。
+- 验证范围仅限上文「配置」表里的硬件（5700X + RX 5600 XT + RTL8125 + ALCS1200A）。换核心数、换非 Navi 10 显卡、换主板时，先按「故障排查」和「维护」两节调整再引导。
 
 ## 组件版本
 
@@ -195,7 +195,7 @@ tools/patches-amd-vanilla.plist  AMD_Vanilla 补丁快照
 | USB 端口不对（前面板/后置错位） | 用 CorpNewt `USBMap` 在本机重新映射（`WIFI II` 与作者同型号，正常可直接用） |
 | 需要看 OpenCore/boot.efi 日志 | 用调试配置：`cp tools/config.debug.plist OC/config.plist`（见下节） |
 | 装完系统后想关调试输出 | 已默认关闭；从调试配置回退即恢复 `-v keepsyms=1 debug=0x100` + `AppleDebug/ApplePanic` |
-| Secure Boot 相关报错 | `Misc/Security/SecureBootModel` 改 `Disabled`，同时把 `Booter/Quirks/FixupAppleEfiImages` 设为 `true`（两者必须成对，见配置文档 8.10） |
+| Secure Boot 相关报错 | `Misc/Security/SecureBootModel` 改 `Disabled`，同时把 `Booter/Quirks/FixupAppleEfiImages` 设为 `true`（两者必须成对，见配置文档 8.10）。当前配置是 `Disabled` + `false`，因为 `run-efi-updater=No` 已挡住 Apple 固件更新，15.8.1 实测不受影响；一旦把 `run-efi-updater` 去掉或改成 `Yes`，就要同时把 `FixupAppleEfiImages` 设为 `true` |
 
 ## 调试配置
 
