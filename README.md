@@ -181,7 +181,7 @@ tools/patches-amd-vanilla.plist  AMD_Vanilla 补丁快照
 5. Kext 全部升级到最新版（见上表），新增 `AMDRyzenCPUPowerManagement`/`SMCAMDProcessor` 更新到 0.7.2f1。
 6. 驱动精简为 4 个并移除 `OpenUsbKbDxe.efi`——它与 `UEFI/Input/KeySupport=true` 冲突（ocvalidate 报错），1.0.x 的输入栈不再需要它。
 7. `Booter/Quirks/ResizeAppleGpuBars` 设为 `0`：BIOS 已开启 Re-Size BAR 时，让 macOS 只看到最小 BAR。
-8. `NVRAM`：`prev-lang:kbd=zh-Hans:252`（首启中文键盘）、`boot-args` 增加 `-v` 便于排错。
+8. `NVRAM`：`prev-lang:kbd=zh-Hans:252`（首启中文键盘）；`boot-args` 默认生产态 `agdpmod=pikera alcid=1`，调试态带 `-v keepsyms=1 debug=0x100`（见「调试配置」一节）。
 9. `Misc/Boot/Timeout` 2 → 5 秒，`Misc/Tools` 只保留真实存在的两个工具。
 
 ## 故障排查
@@ -193,8 +193,28 @@ tools/patches-amd-vanilla.plist  AMD_Vanilla 补丁快照
 | 有 Apple 进度条但黑屏/无加速 | 确认 `SSDT-NAVI.aml` 已删除，`agdpmod=pikera` 在 boot-args 中 |
 | 启动即随机重启 | 先禁用 `AMDRyzenCPUPowerManagement` / `SMCAMDProcessor` 试；保留 `AppleMCEReporterDisabler` |
 | USB 端口不对（前面板/后置错位） | 用 CorpNewt `USBMap` 在本机重新映射（`WIFI II` 与作者同型号，正常可直接用） |
-| 装完系统后想关调试输出 | 从 boot-args 删掉 `-v keepsyms=1 debug=0x100`，并把 `Misc/Debug/AppleDebug` 设 false |
+| 需要看 OpenCore/boot.efi 日志 | 用调试配置：`cp tools/config.debug.plist OC/config.plist`（见下节） |
+| 装完系统后想关调试输出 | 已默认关闭；从调试配置回退即恢复 `-v keepsyms=1 debug=0x100` + `AppleDebug/ApplePanic` |
 | Secure Boot 相关报错 | `Misc/Security/SecureBootModel` 改 `Disabled`，同时把 `Booter/Quirks/FixupAppleEfiImages` 设为 `true`（两者必须成对，见配置文档 8.10） |
+
+## 调试配置
+
+仓库里保留两份配置，`OC/config.plist` 是**生产版**（默认使用）：
+
+| 项 | 生产版（`OC/config.plist`） | 调试版（`tools/config.debug.plist`） |
+|---|---|---|
+| `boot-args` | `agdpmod=pikera alcid=1` | `-v keepsyms=1 debug=0x100 agdpmod=pikera alcid=1` |
+| `Misc/Debug/AppleDebug` | `false` | `true` |
+| `Misc/Debug/ApplePanic` | `false` | `true` |
+
+切换方式（`tools/config.debug.plist` 只作留档，不要覆盖它）：
+
+```bash
+cp tools/config.debug.plist OC/config.plist   # 排错：切到调试版
+git restore OC/config.plist                   # 收工：回到生产版（需已提交）
+```
+
+调试版当前的 `Misc/Debug/Target = 0`，日志会被丢弃；真要抓日志还需把 `Target` 设为 `67`（`0x01|0x02|0x40`，日志+屏幕+写文件）并换用 DEBUG 版 `OpenCore.efi`/`BOOTx64.efi`/`OpenRuntime.efi`，日志会落在 ESP 根目录 `opencore-YYYY-MM-DD-HHMMSS.txt`。
 
 ## 维护
 
