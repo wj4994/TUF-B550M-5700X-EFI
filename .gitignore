@@ -5,3 +5,6 @@
 macOS Downloads/
 
 .DS_Store
+
+# exFAT 卷产生的 AppleDouble 元数据文件
+._*
