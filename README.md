@@ -23,6 +23,7 @@
 - 支持范围：macOS Monterey 12 ~ Sequoia 15（12 ~ 15.8.1 之间未逐一回归；内核补丁上限 `25.99.99` 理论覆盖到 macOS 26 Tahoe，但 26 未验证）。
 - 除 Wi-Fi、蓝牙外功能正常；MT7921 无解，需要无线请更换为 BCM94360NG 等免驱卡（主板 M.2 E-Key 可拆换）。
 - 验证范围仅限上文「配置」表里的硬件（5700X + RX 5600 XT + RTL8125 + ALCS1200A）。换核心数、换非 Navi 10 显卡、换主板时，先按「故障排查」和「维护」两节调整再引导。
+- 升到 macOS 26 Tahoe 需要改什么，见 [`docs/tahoe.md`](docs/tahoe.md)（结论：补丁表与 OC/kext 底座已够用，只剩音频、CPU 传感器、`revpatch=sbvmm` 三处）。
 
 ## 组件版本
 
@@ -162,6 +163,7 @@ OC/Tools/                 OpenShell / ResetSystem（均默认不启用）
 OC/Resources/             OpenCanopy 主题（Chardonnay / GoldenGate / Syrah）
 tools/build_config.py     用官方 Sample.plist 重新生成 config 的脚本
 tools/patches-amd-vanilla.plist  AMD_Vanilla 补丁快照
+docs/tahoe.md             15 → 26 差异与升级改动清单
 ```
 
 合计约 17 MB（`OC/Resources/Audio` 的 6 MB 开机音资源可删，`AudioSupport=false` 用不到）。
